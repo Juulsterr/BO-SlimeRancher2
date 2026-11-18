@@ -1,2 +1,2 @@
 # BO-SlimeRancher2
-## test
+[Trello](https://trello.com/b/NpeJvZec/slime-rancher-2)
