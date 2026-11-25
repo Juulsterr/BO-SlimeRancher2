@@ -3,58 +3,70 @@ using System.Collections.Generic;
 
 public class CurrentShootScript : MonoBehaviour
 {
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private GameObject slime;
+    [SerializeField] private GameObject slimePrefab;
+    [SerializeField] private float suckRange = 5.0f;
+    [SerializeField] private float shootSpeed = 10.0f;
+    [SerializeField] private float shootUpwardBoost = 1.5f;
     [SerializeField] private Transform firePoint;
-    public float vacumeSpeed = 1.0f;
+    [SerializeField] private float radius = 5f;
+    public float vacuumeSpeed = 3.0f;
     private List<GameObject> objectsToVacuum = new List<GameObject>();
+
 
     public void Update()
     {
         if (Input.GetMouseButton(0))
         {
-                if(objectsToVacuum.Count > 0)
+            Collider[] nearbyObjects = Physics.OverlapSphere(firePoint.position, suckRange);
+            foreach (Collider nearbyObject in nearbyObjects)
+            {
+                GameObject objectToVacuum = nearbyObject.gameObject;
+                if (!nearbyObject.CompareTag("Vacuumable") || objectsToVacuum.Contains(objectToVacuum))
                 {
-                    for(int i = 0; i < objectsToVacuum.Count; i++)
-                    {
-                        float distance = Vector3.Distance(firePoint.position, objectsToVacuum[i].transform.position);
-                        if (distance >= 0.1f)
-                        {
-                            // objectsToVacuum[i].GetComponent<Rigidbody>().linearVelocity = -(objectsToVacuum[i].transform.position - transform.position) * vacumeSpeed;
-                            objectsToVacuum[i].transform.position = Vector3.MoveTowards(objectsToVacuum[i].transform.position, firePoint.transform.position, vacumeSpeed * Time.deltaTime);
-                            Debug.Log("#Sucked" + distance);
-                            
-                        }
-                        else
-                        {
-                            objectsToVacuum[i].GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
-                            Debug.Log("Stop");
-                        }
-                    }
+                    continue;
                 }
+
+                float distance = Vector3.Distance(firePoint.position, objectToVacuum.transform.position);
+                if (distance <= 0.3f)
+                {
+                    if (objectToVacuum.TryGetComponent<Rigidbody>(out Rigidbody body))
+                    {
+                        body.linearVelocity = Vector3.zero;
+                    }
+
+                    objectToVacuum.SetActive(false);
+                    objectsToVacuum.Add(objectToVacuum);
+                }
+                else if (distance <= suckRange)
+                {
+                    objectToVacuum.GetComponent<Rigidbody>().linearVelocity = (Random.onUnitSphere * radius);
+                    objectToVacuum.transform.position = Vector3.MoveTowards(
+                        objectToVacuum.transform.position,
+                        firePoint.position,
+                        vacuumeSpeed * Time.deltaTime);
+                }
+            }
         }
 
+        Shoot();
+        
     }
 
 
-    void OnTriggerEnter(Collider other)
+    void Shoot()
     {
-        if (other.CompareTag("Vacuumable") && !objectsToVacuum.Contains(other.gameObject))
+        if (Input.GetMouseButtonDown(1) && objectsToVacuum.Count > 0)
         {
-            objectsToVacuum.Add(other.gameObject);
-        }
+            GameObject slime = objectsToVacuum[0];
+            objectsToVacuum.RemoveAt(0);
+            slime.transform.SetPositionAndRotation(firePoint.position, firePoint.rotation);
+            slime.SetActive(true);
+
+            if (slime.TryGetComponent<Rigidbody>(out Rigidbody body))
+            {
+                body.linearVelocity = firePoint.forward * shootSpeed;
+                body.AddForce(Vector3.down * shootUpwardBoost, ForceMode.VelocityChange);
+            }
+        } 
     }
 }
-
-    // private void Shoot()
-    // {
-    //     if (bulletPrefab != null)
-    //     {
-    //         GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-    //         Destroy(bullet, 1.5f);
-    //     }
-    // }
-        // if (Input.GetMouseButtonDown(0))
-        // {
-        //     Shoot();
-        // }
