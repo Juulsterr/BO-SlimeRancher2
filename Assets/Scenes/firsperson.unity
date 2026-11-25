@@ -1505,6 +1505,7 @@ GameObject:
   - component: {fileID: 1291530696}
   - component: {fileID: 1291530698}
   - component: {fileID: 1291530697}
+  - component: {fileID: 1291530699}
   m_Layer: 5
   m_Name: DayNightCycle
   m_TagString: Untagged
@@ -1570,6 +1571,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1291530695}
   m_CullTransparentMesh: 1
+--- !u!114 &1291530699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291530695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b957c706b28fef64c81079763fef1b1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Timer
+  clockText: {fileID: 563690397}
+  startMinutes: 14
+  startSeconds: 24
+  gameSecondsPerRealSecond: 1
 --- !u!1 &1481936695
 GameObject:
   m_ObjectHideFlags: 0
